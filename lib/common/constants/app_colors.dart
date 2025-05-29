@@ -11,4 +11,6 @@ class AppColors {
   static const Color azul_escuro = Color(0XFF4b5ae4);
   static const Color amarelo = Color(0XFFffbd59);
   static const Color vermelho = Color(0XFFff3131);
+  static const Color preto = Color(0XFF1f1f1f);
+  static const Color verde = Color(0XFF00bf63);
 }

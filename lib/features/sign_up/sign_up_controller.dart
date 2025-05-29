@@ -1,12 +1,15 @@
-//refactoring guru
-
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:src/features/sign_up/sign_up_state.dart';
+import 'package:src/services/auth_service.dart';
+import 'package:src/services/secure_storage.dart';
 
 class SignUpController extends ChangeNotifier {
-  SignUpState _state = SignUpInitialSate();
+  final AuthService _service;
+  final SecureStorage _secureStorage;
+
+  SignUpController(this._service, this._secureStorage);
+
+  SignUpState _state = SignUpInitialState();
 
   SignUpState get state => _state;
 
@@ -15,21 +18,28 @@ class SignUpController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> doSignUp() async {
-    _changeState(SignUpLoadingSate());
+  Future<void> signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    _changeState(SignUpLoadingState());
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      final user = await _service.signUp(
+        name: name,
+        email: email,
+        password: password,
+      );
+      if (user.id != null) {
+        await _secureStorage.write(key: "CURRENT_USER", value: user.toJson());
 
-      // throw Exception("Erro ao cadastrar usuário");
-      log("usario criado com sucesso");
-
-      _changeState(SignUpSuccessSate());
-
-      return true;
+        _changeState(SignUpSuccessState());
+      } else {
+        throw Exception();
+      }
     } catch (e) {
-      _changeState(SignUpErrorSate());
-      return false;
+      _changeState(SignUpErrorState(e.toString()));
     }
   }
 }
